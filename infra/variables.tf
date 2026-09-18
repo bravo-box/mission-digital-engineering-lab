@@ -107,6 +107,28 @@ variable "bastion_sku" {
 }
 
 # ---------------------------------------------------------------------------
+# Storage / registry / foundry
+# ---------------------------------------------------------------------------
+
+variable "storage_account_replication_type" {
+  description = "Replication type for the lab data storage account."
+  type        = string
+  default     = "ZRS"
+}
+
+variable "foundry_sku" {
+  description = "SKU for the Azure AI Foundry (AI Services) account."
+  type        = string
+  default     = "S0"
+}
+
+variable "key_vault_admin_object_ids" {
+  description = "Additional Entra ID object IDs granted Key Vault Administrator on the lab key vault."
+  type        = list(string)
+  default     = []
+}
+
+# ---------------------------------------------------------------------------
 # AKS
 # ---------------------------------------------------------------------------
 
@@ -150,32 +172,6 @@ variable "aks_outbound_type" {
     error_message = "aks_outbound_type must be loadBalancer or userDefinedRouting."
   }
 }
-
-# ---------------------------------------------------------------------------
-# Storage / registry / foundry
-# ---------------------------------------------------------------------------
-
-variable "storage_account_replication_type" {
-  description = "Replication type for the lab data storage account."
-  type        = string
-  default     = "ZRS"
-}
-
-variable "foundry_sku" {
-  description = "SKU for the Azure AI Foundry (AI Services) account."
-  type        = string
-  default     = "S0"
-}
-
-variable "key_vault_admin_object_ids" {
-  description = "Additional Entra ID object IDs granted Key Vault Administrator on the lab key vault."
-  type        = list(string)
-  default     = []
-}
-
-# ---------------------------------------------------------------------------
-# AKS node pools and identity
-# ---------------------------------------------------------------------------
 
 variable "aks_pod_cidr" {
   description = "Pod CIDR used by the Azure CNI overlay network."

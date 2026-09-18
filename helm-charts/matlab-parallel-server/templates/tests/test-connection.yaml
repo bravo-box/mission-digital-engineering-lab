@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: connection-test
-      image: {{ .Values.testImage | default "mcr.microsoft.com/cbl-mariner/busybox:2.0" }}
+      image: {{ .Values.testImage }}
       command: ['sh', '-c']
       args:
         - nc -z -w 5 {{ include "matlab-parallel-server.fullname" . }} {{ .Values.service.port }}

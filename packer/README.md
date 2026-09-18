@@ -31,7 +31,8 @@ Set `build_subnet_id` to a subnet resource ID to keep the temporary build VM on
 the private network instead of giving it a public IP:
 
 ```bash
-packer build -var "build_subnet_id=$(terraform -chdir=../infra output -raw ...)" matlab-dev-vm.pkr.hcl
+SUBNET_ID=$(terraform -chdir=../infra output -json subnet_ids | jq -r '."matlab-vms"')
+packer build -var "build_subnet_id=${SUBNET_ID}" matlab-dev-vm.pkr.hcl
 ```
 
 The build VM still needs outbound access to the MathWorks package manager, so
