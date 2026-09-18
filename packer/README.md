@@ -37,6 +37,10 @@ packer build -var "build_subnet_id=$(terraform -chdir=../infra output -raw ...)"
 The build VM still needs outbound access to the MathWorks package manager, so
 run private builds through the environment's egress path (firewall or proxy).
 
+To let Packer create a temporary build resource group instead, leave
+`build_resource_group_name` empty and supply `location` together with either
+`managed_image_resource_group_name` or `gallery_name`.
+
 ## Publishing to a compute gallery
 
 ```bash

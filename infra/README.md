@@ -19,7 +19,7 @@ network.
   cluster images and OCI artifacts that support air-gapped imports. The cluster
   kubelet identity is granted `AcrPull`.
 - Storage account with `shared_access_key_enabled = false` (Entra ID auth only),
-  hierarchical namespace, and private endpoints for `blob`, `dfs` and `file`.
+  hierarchical namespace, and private endpoints for `blob` and `dfs`.
 - Key vault with RBAC authorization, purge protection and a private endpoint.
 - Azure AI Foundry (AI Services) account with local authentication disabled and
   a private endpoint registered in the `cognitiveservices`, `openai` and

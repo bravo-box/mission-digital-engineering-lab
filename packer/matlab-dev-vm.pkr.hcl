@@ -31,6 +31,12 @@ variable "location" {
   description = "Region used for the build. Only used when build_resource_group_name is empty."
 }
 
+variable "managed_image_resource_group_name" {
+  type        = string
+  default     = ""
+  description = "Resource group the managed image is published to. Defaults to build_resource_group_name."
+}
+
 variable "vm_size" {
   type        = string
   default     = "Standard_D8s_v5"
@@ -86,6 +92,8 @@ variable "build_subnet_id" {
 }
 
 locals {
+  managed_image_resource_group_name = var.managed_image_resource_group_name != "" ? var.managed_image_resource_group_name : var.build_resource_group_name
+
   build_vnet = var.build_subnet_id == "" ? {} : {
     virtual_network_name                = split("/", var.build_subnet_id)[8]
     virtual_network_subnet_name         = split("/", var.build_subnet_id)[10]
@@ -106,7 +114,11 @@ source "azure-arm" "matlab_dev" {
   cloud_environment_name = var.cloud_environment_name
   subscription_id        = var.subscription_id
 
-  build_resource_group_name = var.build_resource_group_name
+  # location and build_resource_group_name are mutually exclusive: an existing
+  # resource group is used when one is supplied, otherwise Packer creates a
+  # temporary resource group in the requested region.
+  build_resource_group_name = var.build_resource_group_name == "" ? null : var.build_resource_group_name
+  location                  = var.build_resource_group_name == "" ? var.location : null
   vm_size                   = var.vm_size
 
   os_type         = "Linux"
@@ -115,7 +127,7 @@ source "azure-arm" "matlab_dev" {
   image_sku       = "22_04-lts-gen2"
 
   managed_image_name                = var.gallery_name == "" ? var.image_name : null
-  managed_image_resource_group_name = var.gallery_name == "" ? var.build_resource_group_name : null
+  managed_image_resource_group_name = var.gallery_name == "" ? local.managed_image_resource_group_name : null
 
   dynamic "shared_image_gallery_destination" {
     for_each = local.shared_image

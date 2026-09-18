@@ -1,6 +1,6 @@
 # Key vault for lab secrets. RBAC only, no public endpoint.
 resource "azurerm_key_vault" "lab" {
-  name                = substr("kv-${var.name_prefix}-${local.suffix}", 0, 24)
+  name                = trimsuffix(substr("kv-${var.name_prefix}-${local.suffix}", 0, 24), "-")
   resource_group_name = azurerm_resource_group.lab.name
   location            = azurerm_resource_group.lab.location
   tenant_id           = data.azurerm_client_config.current.tenant_id
