@@ -1,0 +1,30 @@
+# Copy to terraform.tfvars and adjust for your environment.
+# terraform.tfvars is git ignored because it can contain environment details.
+
+azure_environment = "usgovernment"
+location          = "usgovvirginia"
+name_prefix       = "delab"
+
+# Existing virtual network the lab attaches to.
+virtual_network_name                = "vnet-delab"
+virtual_network_resource_group_name = "rg-delab-network"
+
+subnet_address_prefixes = {
+  matlab_vms     = "10.100.1.0/24"
+  matlab_cluster = "10.100.2.0/23"
+  storage        = "10.100.4.0/26"
+  registry       = "10.100.4.64/26"
+  foundry        = "10.100.4.128/26"
+  key_vault      = "10.100.4.192/26"
+}
+
+# Set to true to deploy Azure Bastion for private access to the MATLAB VMs.
+deploy_bastion                = false
+bastion_subnet_address_prefix = "10.100.5.0/26"
+
+# Entra ID group object IDs granted cluster admin on AKS.
+aks_admin_group_object_ids = []
+
+tags = {
+  environment = "lab"
+}

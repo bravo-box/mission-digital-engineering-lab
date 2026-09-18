@@ -1,0 +1,87 @@
+# Default values for matlab-parallel-server.
+# Images are pulled from the private Azure Container Registry deployed by
+# /infra, so the cluster never needs public registry access.
+
+replicaCount: 2
+
+image:
+  # Login server of the lab container registry, for example
+  # crdelabab123.azurecr.us/matlab-parallel-server
+  repository: ""
+  pullPolicy: IfNotPresent
+  # Defaults to the chart appVersion (the MATLAB release).
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  # Add azure.workload.identity/client-id here to use workload identity for
+  # access to the lab storage account and key vault.
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels:
+  azure.workload.identity/use: "false"
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # ClusterIP keeps the MATLAB job scheduler private to the virtual network.
+  type: ClusterIP
+  port: 27350
+  annotations: {}
+
+# MATLAB specific configuration.
+matlab:
+  # Network license manager reachable from the cluster, for example 27000@lic01.
+  licenseServer: ""
+  # Additional environment variables passed to every worker.
+  extraEnv: []
+
+resources:
+  requests:
+    cpu: "2"
+    memory: 8Gi
+  limits:
+    cpu: "4"
+    memory: 16Gi
+
+livenessProbe:
+  tcpSocket:
+    port: matlab
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+readinessProbe:
+  tcpSocket:
+    port: matlab
+  initialDelaySeconds: 15
+  periodSeconds: 15
+
+# Image used by the `helm test` connection check. Override with an image that
+# is available in the private registry when running air-gapped.
+testImage: mcr.microsoft.com/cbl-mariner/busybox:2.0
+
+volumes: []
+volumeMounts: []
+
+# Schedule onto the MATLAB worker node pool created by /infra.
+nodeSelector:
+  workload: matlab-parallel
+
+tolerations: []
+affinity: {}

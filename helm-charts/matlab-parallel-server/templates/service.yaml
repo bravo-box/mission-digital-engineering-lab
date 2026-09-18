@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "matlab-parallel-server.fullname" . }}
+  labels:
+    {{- include "matlab-parallel-server.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: matlab
+      protocol: TCP
+      name: matlab
+  selector:
+    {{- include "matlab-parallel-server.selectorLabels" . | nindent 4 }}

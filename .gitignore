@@ -42,3 +42,10 @@ terraform.rc
 # Optional: ignore plan files saved before destroying Terraform configuration
 # Uncomment the line below if you want to ignore planout files.
 # planout
+# Terraform plan output produced by scripts/deploy-terraform.sh
+tfplan
+*.tfplan
+
+# Packer
+packer_cache/
+*.auto.pkrvars.hcl

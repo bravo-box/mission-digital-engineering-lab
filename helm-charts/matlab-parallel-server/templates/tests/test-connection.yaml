@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "matlab-parallel-server.fullname" . }}-test-connection"
+  labels:
+    {{- include "matlab-parallel-server.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: connection-test
+      image: {{ .Values.testImage }}
+      command: ['sh', '-c']
+      args:
+        - nc -z -w 5 {{ include "matlab-parallel-server.fullname" . }} {{ .Values.service.port }}
+  restartPolicy: Never

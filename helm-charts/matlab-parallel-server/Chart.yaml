@@ -1,0 +1,10 @@
+apiVersion: v2
+name: matlab-parallel-server
+description: MATLAB Parallel Server workers for the private AKS digital engineering lab
+type: application
+version: 0.1.0
+appVersion: "R2024b"
+keywords:
+  - matlab
+  - parallel-server
+  - digital-engineering

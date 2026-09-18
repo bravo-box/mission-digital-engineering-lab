@@ -1,0 +1,10 @@
+{{ .Chart.Name }} {{ .Chart.AppVersion }} has been deployed to namespace {{ .Release.Namespace }}.
+
+The MATLAB job scheduler service is private to the cluster and the virtual
+network. Reach it from a MATLAB development VM with:
+
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "matlab-parallel-server.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+
+Check the workers with:
+
+  kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/instance={{ .Release.Name }}"
