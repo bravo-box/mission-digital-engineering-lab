@@ -65,16 +65,3 @@ module "pe_storage_dfs" {
   private_dns_zone_ids           = [azurerm_private_dns_zone.lab["dfs"].id]
   tags                           = local.tags
 }
-
-module "pe_storage_file" {
-  source = "./modules/private_endpoint"
-
-  name                           = "pe-${var.name_prefix}-storage-file"
-  location                       = azurerm_resource_group.lab.location
-  resource_group_name            = azurerm_resource_group.lab.name
-  subnet_id                      = azurerm_subnet.lab["storage"].id
-  private_connection_resource_id = azurerm_storage_account.data.id
-  subresource_names              = ["file"]
-  private_dns_zone_ids           = [azurerm_private_dns_zone.lab["file"].id]
-  tags                           = local.tags
-}

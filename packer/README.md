@@ -19,7 +19,6 @@ packer init matlab-dev-vm.pkr.hcl
 packer validate matlab-dev-vm.pkr.hcl
 packer build \
   -var "build_resource_group_name=rg-delab-packer" \
-  -var "location=usgovvirginia" \
   matlab-dev-vm.pkr.hcl
 ```
 

@@ -64,6 +64,6 @@ cat <<EOF
 
   packer init packer/matlab-dev-vm.pkr.hcl
   packer build -var "build_resource_group_name=${RESOURCE_GROUP}" \\
-    -var "location=${LOCATION}" packer/matlab-dev-vm.pkr.hcl
+    packer/matlab-dev-vm.pkr.hcl
 
 EOF

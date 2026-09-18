@@ -21,7 +21,7 @@ Usage: $(basename "$0") <plan|deploy|destroy> [options]
 
 Actions:
   plan      Initialise the configuration and write a plan to ${PLAN_FILE}
-  deploy    Apply the configuration (runs a plan first)
+  deploy    Apply the configuration
   destroy   Destroy every resource managed by the configuration
 
 Options:
@@ -74,19 +74,19 @@ terraform -chdir="${INFRA_DIR}" validate
 
 case "${ACTION}" in
   plan)
-    terraform -chdir="${INFRA_DIR}" plan -input=false "${TF_ARGS[@]}" -out="${PLAN_FILE}"
+    terraform -chdir="${INFRA_DIR}" plan -input=false "${TF_ARGS[@]+"${TF_ARGS[@]}"}" -out="${PLAN_FILE}"
     log "Plan written to ${PLAN_FILE}"
     ;;
   deploy)
     APPLY_ARGS=(-input=false)
     [[ "${AUTO_APPROVE}" == "true" ]] && APPLY_ARGS+=(-auto-approve)
-    terraform -chdir="${INFRA_DIR}" apply "${APPLY_ARGS[@]}" "${TF_ARGS[@]}"
+    terraform -chdir="${INFRA_DIR}" apply "${APPLY_ARGS[@]}" "${TF_ARGS[@]+"${TF_ARGS[@]}"}"
     log "Deployment complete"
     ;;
   destroy)
     DESTROY_ARGS=(-input=false)
     [[ "${AUTO_APPROVE}" == "true" ]] && DESTROY_ARGS+=(-auto-approve)
-    terraform -chdir="${INFRA_DIR}" destroy "${DESTROY_ARGS[@]}" "${TF_ARGS[@]}"
+    terraform -chdir="${INFRA_DIR}" destroy "${DESTROY_ARGS[@]}" "${TF_ARGS[@]+"${TF_ARGS[@]}"}"
     log "Destroy complete"
     ;;
 esac

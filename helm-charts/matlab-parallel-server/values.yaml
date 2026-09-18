@@ -72,6 +72,10 @@ readinessProbe:
   initialDelaySeconds: 15
   periodSeconds: 15
 
+# Image used by the `helm test` connection check. Override with an image that
+# is available in the private registry when running air-gapped.
+testImage: mcr.microsoft.com/cbl-mariner/busybox:2.0
+
 volumes: []
 volumeMounts: []
 

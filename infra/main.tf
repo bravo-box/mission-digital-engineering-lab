@@ -27,7 +27,6 @@ locals {
     public = {
       blob      = "privatelink.blob.core.windows.net"
       dfs       = "privatelink.dfs.core.windows.net"
-      file      = "privatelink.file.core.windows.net"
       vault     = "privatelink.vaultcore.azure.net"
       registry  = "privatelink.azurecr.io"
       cognitive = "privatelink.cognitiveservices.azure.com"
@@ -37,7 +36,6 @@ locals {
     usgovernment = {
       blob      = "privatelink.blob.core.usgovcloudapi.net"
       dfs       = "privatelink.dfs.core.usgovcloudapi.net"
-      file      = "privatelink.file.core.usgovcloudapi.net"
       vault     = "privatelink.vaultcore.usgovcloudapi.net"
       registry  = "privatelink.azurecr.us"
       cognitive = "privatelink.cognitiveservices.azure.us"
@@ -47,7 +45,6 @@ locals {
     china = {
       blob      = "privatelink.blob.core.chinacloudapi.cn"
       dfs       = "privatelink.dfs.core.chinacloudapi.cn"
-      file      = "privatelink.file.core.chinacloudapi.cn"
       vault     = "privatelink.vaultcore.azure.cn"
       registry  = "privatelink.azurecr.cn"
       cognitive = "privatelink.cognitiveservices.azure.cn"
