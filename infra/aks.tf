@@ -5,8 +5,8 @@ resource "azurerm_user_assigned_identity" "aks" {
   tags                = local.tags
 }
 
-# The cluster identity manages the subnet and the private DNS zone entries of
-# the private cluster, so it needs Network Contributor on the lab subnets.
+# The cluster identity manages the load balancer and node network interfaces in
+# the cluster subnet, so it needs Network Contributor on that subnet.
 resource "azurerm_role_assignment" "aks_network_contributor" {
   scope                = azurerm_subnet.lab["matlab_cluster"].id
   role_definition_name = "Network Contributor"

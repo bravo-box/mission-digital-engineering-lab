@@ -21,9 +21,6 @@ resource "azurerm_subnet" "lab" {
   address_prefixes     = [var.subnet_address_prefixes[each.key]]
 
   private_endpoint_network_policies = contains(local.private_endpoint_subnets, each.key) ? "Disabled" : "Enabled"
-
-  # Keep traffic to the platform services on the Azure backbone.
-  service_endpoints = each.key == "matlab_cluster" ? ["Microsoft.Storage", "Microsoft.KeyVault", "Microsoft.ContainerRegistry"] : []
 }
 
 # ---------------------------------------------------------------------------

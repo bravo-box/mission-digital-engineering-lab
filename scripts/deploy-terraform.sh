@@ -21,7 +21,8 @@ Usage: $(basename "$0") <plan|deploy|destroy> [options]
 
 Actions:
   plan      Initialise the configuration and write a plan to ${PLAN_FILE}
-  deploy    Apply the configuration
+  deploy    Apply the configuration. The plan is recalculated, so the file
+            written by 'plan' is advisory only and is never applied directly.
   destroy   Destroy every resource managed by the configuration
 
 Options:
