@@ -8,8 +8,12 @@ locals {
     key_vault      = "key-vault"
   }
 
-  # Subnets that only host private endpoints.
   private_endpoint_subnets = ["storage", "registry", "foundry", "key_vault"]
+}
+
+data "azurerm_virtual_network" "lab" {
+  name                = var.virtual_network_name
+  resource_group_name = var.virtual_network_resource_group_name
 }
 
 resource "azurerm_subnet" "lab" {
@@ -23,17 +27,13 @@ resource "azurerm_subnet" "lab" {
   private_endpoint_network_policies = contains(local.private_endpoint_subnets, each.key) ? "Disabled" : "Enabled"
 }
 
-# ---------------------------------------------------------------------------
-# Network security groups. Public inbound traffic is denied everywhere.
-# ---------------------------------------------------------------------------
-
 resource "azurerm_network_security_group" "lab" {
   for_each = local.subnet_names
 
   name                = "nsg-${var.name_prefix}-${each.value}"
-  location            = azurerm_resource_group.lab.location
-  resource_group_name = azurerm_resource_group.lab.name
-  tags                = local.tags
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
 
   security_rule {
     name                       = "AllowVnetInBound"
@@ -67,10 +67,6 @@ resource "azurerm_subnet_network_security_group_association" "lab" {
   network_security_group_id = azurerm_network_security_group.lab[each.key].id
 }
 
-# ---------------------------------------------------------------------------
-# Optional Azure Bastion for private access to the MATLAB development VMs.
-# ---------------------------------------------------------------------------
-
 resource "azurerm_subnet" "bastion" {
   count = var.deploy_bastion ? 1 : 0
 
@@ -84,22 +80,22 @@ resource "azurerm_public_ip" "bastion" {
   count = var.deploy_bastion ? 1 : 0
 
   name                = "pip-${var.name_prefix}-bastion"
-  location            = azurerm_resource_group.lab.location
-  resource_group_name = azurerm_resource_group.lab.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
-  tags                = local.tags
+  tags                = var.tags
 }
 
 resource "azurerm_bastion_host" "lab" {
   count = var.deploy_bastion ? 1 : 0
 
   name                = "bas-${var.name_prefix}"
-  location            = azurerm_resource_group.lab.location
-  resource_group_name = azurerm_resource_group.lab.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   sku                 = var.bastion_sku
   tunneling_enabled   = var.bastion_sku == "Standard"
-  tags                = local.tags
+  tags                = var.tags
 
   ip_configuration {
     name                 = "configuration"

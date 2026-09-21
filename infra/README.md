@@ -68,6 +68,14 @@ The provider authenticates with the Azure CLI user
 Run `terraform fmt -recursive` and `terraform validate` before committing
 changes.
 
+## Module layout
+
+Each infrastructure component is isolated under `modules/` with its resources,
+inputs, and outputs split across `main.tf`, `variables.tf`, and `outputs.tf`.
+The root module creates shared resources and composes the `network`, `storage`,
+`registry`, `key_vault`, `foundry`, and `aks` modules. The reusable
+`private_endpoint` module is consumed by service modules.
+
 ## Notes
 
 - Because the AKS API server and the container registry are private, `kubectl`
