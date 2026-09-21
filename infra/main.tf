@@ -1,10 +1,5 @@
 data "azurerm_client_config" "current" {}
 
-data "azurerm_virtual_network" "lab" {
-  name                = var.virtual_network_name
-  resource_group_name = var.virtual_network_resource_group_name
-}
-
 resource "random_string" "suffix" {
   length  = 5
   lower   = true
@@ -81,7 +76,104 @@ resource "azurerm_private_dns_zone_virtual_network_link" "lab" {
   name                  = "${var.name_prefix}-${each.key}-link"
   resource_group_name   = azurerm_resource_group.lab.name
   private_dns_zone_name = each.value.name
-  virtual_network_id    = data.azurerm_virtual_network.lab.id
+  virtual_network_id    = module.network.virtual_network_id
   registration_enabled  = false
   tags                  = local.tags
+}
+
+module "network" {
+  source = "./modules/network"
+
+  name_prefix                         = var.name_prefix
+  location                            = azurerm_resource_group.lab.location
+  resource_group_name                 = azurerm_resource_group.lab.name
+  virtual_network_name                = var.virtual_network_name
+  virtual_network_resource_group_name = var.virtual_network_resource_group_name
+  subnet_address_prefixes             = var.subnet_address_prefixes
+  deploy_bastion                      = var.deploy_bastion
+  bastion_subnet_address_prefix       = var.bastion_subnet_address_prefix
+  bastion_sku                         = var.bastion_sku
+  tags                                = local.tags
+}
+
+module "storage" {
+  source = "./modules/storage"
+
+  name_prefix              = var.name_prefix
+  suffix                   = local.suffix
+  location                 = azurerm_resource_group.lab.location
+  resource_group_name      = azurerm_resource_group.lab.name
+  subnet_id                = module.network.subnet_ids_by_purpose["storage"]
+  replication_type         = var.storage_account_replication_type
+  blob_private_dns_zone_id = azurerm_private_dns_zone.lab["blob"].id
+  dfs_private_dns_zone_id  = azurerm_private_dns_zone.lab["dfs"].id
+  tags                     = local.tags
+}
+
+module "registry" {
+  source = "./modules/registry"
+
+  name_prefix         = var.name_prefix
+  suffix              = local.suffix
+  location            = azurerm_resource_group.lab.location
+  resource_group_name = azurerm_resource_group.lab.name
+  subnet_id           = module.network.subnet_ids_by_purpose["registry"]
+  private_dns_zone_id = azurerm_private_dns_zone.lab["registry"].id
+  tags                = local.tags
+}
+
+module "key_vault" {
+  source = "./modules/key_vault"
+
+  name_prefix          = var.name_prefix
+  suffix               = local.suffix
+  location             = azurerm_resource_group.lab.location
+  resource_group_name  = azurerm_resource_group.lab.name
+  tenant_id            = data.azurerm_client_config.current.tenant_id
+  current_principal_id = data.azurerm_client_config.current.object_id
+  admin_object_ids     = var.key_vault_admin_object_ids
+  subnet_id            = module.network.subnet_ids_by_purpose["key_vault"]
+  private_dns_zone_id  = azurerm_private_dns_zone.lab["vault"].id
+  tags                 = local.tags
+}
+
+module "foundry" {
+  source = "./modules/foundry"
+
+  name_prefix         = var.name_prefix
+  suffix              = local.suffix
+  location            = azurerm_resource_group.lab.location
+  resource_group_name = azurerm_resource_group.lab.name
+  sku                 = var.foundry_sku
+  subnet_id           = module.network.subnet_ids_by_purpose["foundry"]
+  private_dns_zone_ids = [
+    azurerm_private_dns_zone.lab["cognitive"].id,
+    azurerm_private_dns_zone.lab["openai"].id,
+    azurerm_private_dns_zone.lab["ai"].id,
+  ]
+  tags = local.tags
+}
+
+module "aks" {
+  source = "./modules/aks"
+
+  name_prefix            = var.name_prefix
+  suffix                 = local.suffix
+  location               = azurerm_resource_group.lab.location
+  resource_group_name    = azurerm_resource_group.lab.name
+  tenant_id              = data.azurerm_client_config.current.tenant_id
+  subnet_id              = module.network.subnet_ids_by_purpose["matlab_cluster"]
+  container_registry_id  = module.registry.id
+  kubernetes_version     = var.aks_kubernetes_version
+  system_node_count      = var.aks_system_node_count
+  system_node_size       = var.aks_system_node_size
+  service_cidr           = var.aks_service_cidr
+  dns_service_ip         = var.aks_dns_service_ip
+  outbound_type          = var.aks_outbound_type
+  pod_cidr               = var.aks_pod_cidr
+  admin_group_object_ids = var.aks_admin_group_object_ids
+  local_account_disabled = var.aks_local_account_disabled
+  matlab_node_count      = var.aks_matlab_node_count
+  matlab_node_size       = var.aks_matlab_node_size
+  tags                   = local.tags
 }
