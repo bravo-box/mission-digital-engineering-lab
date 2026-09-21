@@ -2,7 +2,7 @@
 #
 # install-docker-ubuntu.sh - Install Docker Engine for devcontainer workloads.
 #
-# Supported operating system: Ubuntu 24.04 LTS.
+# Supported operating system: Ubuntu 26.04 LTS.
 set -euo pipefail
 
 TARGET_USER="${SUDO_USER:-${USER:-}}"
@@ -20,7 +20,7 @@ usage() {
 Usage: $(basename "$0") [options]
 
 Installs Docker Engine, Buildx and Docker Compose from Docker's official apt
-repository on Ubuntu 24.04 LTS. The target user is added to the docker group so
+repository on Ubuntu 26.04 LTS. The target user is added to the docker group so
 devcontainer tooling can access the Docker socket without sudo.
 
 Options:
@@ -60,8 +60,8 @@ fi
 
 # shellcheck source=/dev/null
 source /etc/os-release
-if [[ "${ID:-}" != "ubuntu" || "${VERSION_ID:-}" != "24.04" ]]; then
-  err "This script supports Ubuntu 24.04 LTS only (detected ${PRETTY_NAME:-unknown})."
+if [[ "${ID:-}" != "ubuntu" || "${VERSION_ID:-}" != "26.04" ]]; then
+  err "This script supports Ubuntu 26.04 LTS only (detected ${PRETTY_NAME:-unknown})."
   exit 1
 fi
 
@@ -89,14 +89,23 @@ log "Installing apt prerequisites"
 "${SUDO[@]}" apt-get install -y ca-certificates curl
 
 log "Removing packages that conflict with Docker Engine"
-"${SUDO[@]}" apt-get remove -y \
+CONFLICTING_PACKAGES=()
+for package in \
   docker.io \
   docker-compose \
   docker-compose-v2 \
   docker-doc \
   podman-docker \
   containerd \
-  runc
+  runc; do
+  if dpkg-query -W -f='${db:Status-Abbrev}' "${package}" 2>/dev/null | grep -q '^ii '; then
+    CONFLICTING_PACKAGES+=("${package}")
+  fi
+done
+
+if [[ ${#CONFLICTING_PACKAGES[@]} -gt 0 ]]; then
+  "${SUDO[@]}" apt-get remove -y "${CONFLICTING_PACKAGES[@]}"
+fi
 
 log "Configuring Docker's official apt repository"
 "${SUDO[@]}" install -m 0755 -d /etc/apt/keyrings
