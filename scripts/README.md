@@ -9,7 +9,7 @@ Azure Government (`AzureUSGovernment`) by default. Override with `--cloud` or
 | `creating-lz.sh` | Create the landing zone resource group and virtual network the Terraform points at |
 | `deploy-terraform.sh` | Plan, deploy or destroy the `/infra` Terraform environment |
 | `create-packer-rg.sh` | Create the resource group (and optional compute gallery) that Packer images land in |
-| `install-docker-ubuntu.sh` | Install Docker Engine, Buildx and Compose on Ubuntu 24.04 for devcontainers |
+| `install-docker-ubuntu.sh` | Install Docker Engine, Buildx and Compose on Ubuntu 22.04 LTS for devcontainers |
 | `common.sh` | Shared helpers, sourced by the other scripts |
 
 Run any script with `--help` for the full list of options.
