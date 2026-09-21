@@ -1,13 +1,15 @@
 # Scripts
 
-Every script authenticates with the Azure CLI user and targets Azure Government
-(`AzureUSGovernment`) by default. Override with `--cloud` or `AZURE_CLOUD`.
+The Azure deployment scripts authenticate with the Azure CLI user and target
+Azure Government (`AzureUSGovernment`) by default. Override with `--cloud` or
+`AZURE_CLOUD`.
 
 | Script | Purpose |
 | --- | --- |
 | `creating-lz.sh` | Create the landing zone resource group and virtual network the Terraform points at |
 | `deploy-terraform.sh` | Plan, deploy or destroy the `/infra` Terraform environment |
 | `create-packer-rg.sh` | Create the resource group (and optional compute gallery) that Packer images land in |
+| `install-docker-ubuntu.sh` | Install Docker Engine, Buildx and Compose on Ubuntu 24.04 for devcontainers |
 | `common.sh` | Shared helpers, sourced by the other scripts |
 
 Run any script with `--help` for the full list of options.
@@ -18,4 +20,14 @@ Run any script with `--help` for the full list of options.
 ./deploy-terraform.sh deploy --auto-approve
 ./deploy-terraform.sh destroy
 ./create-packer-rg.sh --resource-group rg-delab-packer --gallery sigdelab
+./install-docker-ubuntu.sh
+```
+
+`install-docker-ubuntu.sh` installs from Docker's official apt repository,
+enables the Docker service and adds the invoking user to the `docker` group.
+Log out and back in after it completes. When provisioning as `root`, identify
+the non-root development user explicitly:
+
+```bash
+./install-docker-ubuntu.sh --user azureuser
 ```
