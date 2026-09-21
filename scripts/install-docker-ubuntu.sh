@@ -2,7 +2,7 @@
 #
 # install-docker-ubuntu.sh - Install Docker Engine for devcontainer workloads.
 #
-# Supported operating system: Ubuntu 22.04 LTS.
+# Supported operating system: Ubuntu 26.04 LTS.
 set -euo pipefail
 
 TARGET_USER="${SUDO_USER:-${USER:-}}"
@@ -20,7 +20,7 @@ usage() {
 Usage: $(basename "$0") [options]
 
 Installs Docker Engine, Buildx and Docker Compose from Docker's official apt
-repository on Ubuntu 22.04 LTS. The target user is added to the docker group so
+repository on Ubuntu 26.04 LTS. The target user is added to the docker group so
 devcontainer tooling can access the Docker socket without sudo.
 
 Options:
@@ -60,8 +60,8 @@ fi
 
 # shellcheck source=/dev/null
 source /etc/os-release
-if [[ "${ID:-}" != "ubuntu" || "${VERSION_ID:-}" != "22.04" ]]; then
-  err "This script supports Ubuntu 22.04 LTS only (detected ${PRETTY_NAME:-unknown})."
+if [[ "${ID:-}" != "ubuntu" || "${VERSION_ID:-}" != "26.04" ]]; then
+  err "This script supports Ubuntu 26.04 LTS only (detected ${PRETTY_NAME:-unknown})."
   exit 1
 fi
 
