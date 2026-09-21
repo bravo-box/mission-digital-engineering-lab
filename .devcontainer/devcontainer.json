@@ -1,0 +1,33 @@
+{
+  "name": "Digital Engineering Lab Infrastructure",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "AZURE_CONFIG_DIR": "/home/vscode/.azure",
+    "TF_PLUGIN_CACHE_DIR": "/home/vscode/.terraform.d/plugin-cache"
+  },
+  "mounts": [
+    "source=mission-digital-engineering-lab-azure,target=/home/vscode/.azure,type=volume",
+    "source=mission-digital-engineering-lab-terraform-cache,target=/home/vscode/.terraform.d/plugin-cache,type=volume"
+  ],
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "HashiCorp.terraform",
+        "HashiCorp.HCL",
+        "ms-vscode.azurecli",
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck"
+      ],
+      "settings": {
+        "terraform.languageServer.enable": true,
+        "terraform.validation.enableEnhancedValidation": true,
+        "files.eol": "\n"
+      }
+    }
+  }
+}

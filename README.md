@@ -36,10 +36,22 @@ Subnets added to the existing virtual network:
 All tooling authenticates as the Azure CLI user against Azure Government
 (`AzureUSGovernment`) by default.
 
+### Development container
+
+The repository includes a development container with Terraform, Packer, the
+Azure CLI, kubectl, Helm, jq and ShellCheck. Open the repository in a
+devcontainer-capable editor, then authenticate from the container:
+
 ```bash
 az cloud set --name AzureUSGovernment
 az login
+```
 
+Azure CLI credentials and the Terraform provider cache are kept in named
+volumes, so they survive container rebuilds. The commands below can then be run
+directly from the container terminal.
+
+```bash
 # 1. Create the landing zone virtual network (skip if one already exists)
 ./scripts/creating-lz.sh --resource-group rg-delab-network --name vnet-delab
 
