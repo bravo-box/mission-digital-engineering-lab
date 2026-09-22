@@ -9,7 +9,7 @@ Azure Government (`AzureUSGovernment`) by default. Override with `--cloud` or
 | `creating-lz.sh` | Create the landing zone resource group and virtual network the Terraform points at |
 | `deploy-terraform.sh` | Plan, deploy or destroy the `/infra` Terraform environment |
 | `create-packer-rg.sh` | Create the resource group (and optional compute gallery) that Packer images land in |
-| `create-matlab-vm.sh` | Create a private VM from a managed or compute gallery Packer image |
+| `create-matlab-vm.sh` | Create a private Linux or Windows VM from a managed Packer image |
 | `install-docker-ubuntu.sh` | Install Docker Engine, Buildx and Compose on Ubuntu 26.04 LTS for devcontainers |
 | `common.sh` | Shared helpers, sourced by the other scripts |
 
@@ -31,19 +31,39 @@ Terraform's approval prompt enabled.
 ```
 
 `create-matlab-vm.sh` uses the `matlab-vms` subnet from the Terraform outputs,
-creates no public IP and defaults to the managed image produced by
-`packer/matlab-dev-vm.pkr.hcl`. To deploy a gallery image instead:
+creates no public IP and passes the managed image's full Azure resource ID to
+`az vm create`. It defaults to the `matlab-dev-linux` image produced by
+`packer/matlab-dev-linux-vm.pkr.hcl`:
+
+```bash
+./create-matlab-vm.sh --name matlab-linux-01 --os linux
+```
+
+Use `--os windows` for the `matlab-dev-windows2022` image. The script securely
+prompts for the Windows administrator password:
 
 ```bash
 ./create-matlab-vm.sh \
-  --name matlab-dev-02 \
-  --gallery sigdelab \
-  --image-version 1.0.0
+  --name matlab-windows-01 \
+  --os windows
+```
+
+For non-interactive use, supply the password through the `ADMIN_PASSWORD`
+environment variable without storing it in the repository.
+
+To deploy another managed image, pass its complete resource ID:
+
+```bash
+./create-matlab-vm.sh \
+  --name matlab-linux-02 \
+  --os linux \
+  --image-id /subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Compute/images/<image-name>
 ```
 
 Pass `--subnet-id` when the subnet is not managed by this repository's
 Terraform configuration. Run `./create-matlab-vm.sh --help` for all image,
-network, VM size, SSH key, cloud and subscription options.
+network, operating system, VM size, authentication, cloud and subscription
+options.
 
 `install-docker-ubuntu.sh` installs from Docker's official apt repository,
 enables the Docker service and adds the invoking user to the `docker` group.

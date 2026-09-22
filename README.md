@@ -74,8 +74,9 @@ $EDITOR infra/terraform.tfvars
 packer init packer/matlab-dev-linux-vm.pkr.hcl
 packer build packer/matlab-dev-linux-vm.pkr.hcl
 
-# 5. Create a private MATLAB development VM from the image
-./scripts/create-matlab-vm.sh --name matlab-dev-01
+# 5. Create a private MATLAB development VM from a managed image
+./scripts/create-matlab-vm.sh --name matlab-linux-01 --os linux
+# For Windows, use: --name matlab-windows-01 --os windows
 
 # 6. Deploy workloads to the cluster
 helm upgrade --install matlab helm-charts/matlab-parallel-server \
