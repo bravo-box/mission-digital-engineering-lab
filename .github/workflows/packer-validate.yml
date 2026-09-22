@@ -44,11 +44,9 @@ jobs:
       - name: Initialize and validate templates
         shell: bash
         run: |
-          mapfile -t template_directories < <(
-            find packer -type f -name '*.pkr.hcl' -printf '%h\n' | sort -u
-          )
+          mapfile -d '' templates < <(find packer -type f -name '*.pkr.hcl' -print0)
 
-          for directory in "${template_directories[@]}"; do
-            packer init "$directory"
-            packer validate "$directory"
+          for template in "${templates[@]}"; do
+            packer init "$template"
+            packer validate "$template"
           done
