@@ -9,7 +9,8 @@ set -euo pipefail
 
 MATLAB_RELEASE="${MATLAB_RELEASE:-R2024b}"
 MATLAB_PRODUCTS="${MATLAB_PRODUCTS:-MATLAB}"
-MATLAB_INSTALL_DIR="${MATLAB_INSTALL_DIR:-/opt/matlab/${MATLAB_RELEASE}}"
+MATLAB_INSTALL_DIR="${MATLAB_INSTALL_DIR:-/usr/local/matlab}"
+MATLAB_SOURCE_LOCATION="${MATLAB_SOURCE_LOCATION:-}"
 MPM_URL="${MPM_URL:-https://www.mathworks.com/mpm/glnxa64/mpm}"
 
 export DEBIAN_FRONTEND=noninteractive
@@ -38,11 +39,24 @@ curl -fsSL "${MPM_URL}" -o /tmp/mpm
 chmod +x /tmp/mpm
 
 echo "Installing ${MATLAB_RELEASE}: ${MATLAB_PRODUCTS}"
-# shellcheck disable=SC2086
-/tmp/mpm install \
-  --release="${MATLAB_RELEASE}" \
-  --destination="${MATLAB_INSTALL_DIR}" \
-  --products ${MATLAB_PRODUCTS}
+mpm_args=(
+  install
+  "--release=${MATLAB_RELEASE}"
+  "--destination=${MATLAB_INSTALL_DIR}"
+  --products
+)
+
+# Product names are intentionally word-split because mpm expects one argument
+# per product.
+# shellcheck disable=SC2206
+products=(${MATLAB_PRODUCTS})
+mpm_args+=("${products[@]}")
+
+if [[ -n "${MATLAB_SOURCE_LOCATION}" ]]; then
+  mpm_args+=("--source=${MATLAB_SOURCE_LOCATION}")
+fi
+
+/tmp/mpm "${mpm_args[@]}"
 
 rm -f /tmp/mpm
 

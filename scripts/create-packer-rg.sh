@@ -62,8 +62,8 @@ fi
 log "Packer target ready. Build with:"
 cat <<EOF
 
-  packer init packer/matlab-dev-vm.pkr.hcl
+  packer init packer/matlab-dev-linux-vm.pkr.hcl
   packer build -var "build_resource_group_name=${RESOURCE_GROUP}" \\
-    packer/matlab-dev-vm.pkr.hcl
+    packer/matlab-dev-linux-vm.pkr.hcl
 
 EOF

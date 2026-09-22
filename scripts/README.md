@@ -15,6 +15,11 @@ Azure Government (`AzureUSGovernment`) by default. Override with `--cloud` or
 
 Run any script with `--help` for the full list of options.
 
+In VS Code, use **Tasks: Run Task** to run the common setup and infrastructure
+operations without assembling command-line arguments. The Azure resource tasks
+prompt for names and location, and the Terraform deploy and destroy tasks keep
+Terraform's approval prompt enabled.
+
 ```bash
 ./creating-lz.sh --resource-group rg-delab-network --name vnet-delab --address-space 10.100.0.0/16
 ./deploy-terraform.sh plan
