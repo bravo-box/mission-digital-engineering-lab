@@ -1,0 +1,11 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "terraform": true,
+        "command": true,
+        "true": true,
+        "/^shellcheck -x scripts/create-matlab-vm\\.sh scripts/common\\.sh$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

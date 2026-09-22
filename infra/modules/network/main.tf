@@ -8,7 +8,7 @@ locals {
     key_vault      = "key-vault"
   }
 
-  private_endpoint_subnets = ["storage", "registry", "foundry", "key_vault"]
+  private_endpoint_subnets = ["matlab_cluster", "storage", "registry", "foundry", "key_vault"]
 }
 
 data "azurerm_virtual_network" "lab" {

@@ -16,14 +16,18 @@ terraform {
 # Authentication is performed with the Azure CLI (az login) against the
 # requested cloud, which defaults to Azure Government.
 provider "azurerm" {
-  environment     = var.azure_environment
-  subscription_id = var.subscription_id
-  use_cli         = true
+  environment         = var.azure_environment
+  subscription_id     = var.subscription_id
+  use_cli             = true
+  storage_use_azuread = true
 
   features {
     key_vault {
-      purge_soft_delete_on_destroy    = false
+      purge_soft_delete_on_destroy    = true
       recover_soft_deleted_key_vaults = true
+    }
+    resource_group {
+      prevent_deletion_if_contains_resources = false
     }
   }
 }

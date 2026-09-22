@@ -14,7 +14,9 @@ network.
   (`deploy_bastion = true`).
 - Private AKS cluster in `matlab-cluster` with a `system` node pool and a
   `matlab` worker node pool labelled `workload=matlab-parallel`, Azure CNI
-  overlay networking, Entra ID (Azure AD) RBAC and workload identity.
+  overlay networking, Entra ID (Azure AD) RBAC and workload identity. Private
+  endpoint network policies are disabled on this subnet so AKS can create its
+  managed API server private endpoint.
 - Premium Azure Container Registry with public access disabled, used for the
   cluster images and OCI artifacts that support air-gapped imports. The cluster
   kubelet identity is granted `AcrPull`.
@@ -42,7 +44,8 @@ cp terraform.tfvars.example terraform.tfvars
 
 The provider authenticates with the Azure CLI user
 (`use_cli = true`) and targets Azure Government by default
-(`azure_environment = "usgovernment"`).
+(`azure_environment = "usgovernment"`). Storage data-plane operations also use
+the CLI user's Entra ID credentials because account keys are disabled.
 
 ## Required inputs
 

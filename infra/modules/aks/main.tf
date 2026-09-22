@@ -27,6 +27,7 @@ resource "azurerm_kubernetes_cluster" "lab" {
   oidc_issuer_enabled                 = true
   workload_identity_enabled           = true
   image_cleaner_enabled               = true
+  image_cleaner_interval_hours        = 48
 
   default_node_pool {
     name                         = "system"
