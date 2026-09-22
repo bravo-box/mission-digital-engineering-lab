@@ -1,0 +1,54 @@
+name: Packer validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "packer/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: packer-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate Packer
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v3
+
+      - name: Check formatting
+        shell: bash
+        run: |
+          mapfile -d '' templates < <(find packer -type f -name '*.pkr.hcl' -print0)
+          if (( ${#templates[@]} == 0 )); then
+            echo "::error::No *.pkr.hcl files were found under packer."
+            exit 1
+          fi
+
+          for template in "${templates[@]}"; do
+            packer fmt -check -diff "$template"
+          done
+
+      - name: Initialize and validate templates
+        shell: bash
+        run: |
+          mapfile -t template_directories < <(
+            find packer -type f -name '*.pkr.hcl' -printf '%h\n' | sort -u
+          )
+
+          for directory in "${template_directories[@]}"; do
+            packer init "$directory"
+            packer validate "$directory"
+          done
