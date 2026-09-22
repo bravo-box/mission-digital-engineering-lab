@@ -6,6 +6,7 @@ Packer templates that build the MATLAB development VM images used in the
 | Template | Image |
 | --- | --- |
 | `matlab-dev-vm.pkr.hcl` | Ubuntu 22.04 LTS with MATLAB, Parallel Computing Toolbox and MATLAB Parallel Server |
+| `matlab-dev-win-vm.pkr.hcl` | Windows Server 2022 with MATLAB, Parallel Computing Toolbox, MATLAB Parallel Server and Simulink |
 
 ## Usage
 
@@ -21,6 +22,12 @@ packer build \
   -var "build_resource_group_name=rg-delab-packer" \
   matlab-dev-vm.pkr.hcl
 ```
+
+To build the Windows development image, substitute
+`matlab-dev-win-vm.pkr.hcl` in the `init`, `validate`, and `build` commands.
+The Windows template follows the MathWorks Azure reference architecture: it
+installs MATLAB with the MathWorks package manager, restarts Windows, waits for
+the Azure guest services, and runs Sysprep before image capture.
 
 Builds authenticate as the Azure CLI user (`use_azure_cli_auth = true`) and
 target Azure Government by default (`cloud_environment_name = "Usgovernment"`).
