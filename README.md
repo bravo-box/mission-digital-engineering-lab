@@ -71,8 +71,8 @@ $EDITOR infra/terraform.tfvars
 
 # 4. Build MATLAB VM images
 ./scripts/create-packer-rg.sh --resource-group rg-delab-packer
-packer init packer/matlab-dev-vm.pkr.hcl
-packer build packer/matlab-dev-vm.pkr.hcl
+packer init packer/matlab-dev-linux-vm.pkr.hcl
+packer build packer/matlab-dev-linux-vm.pkr.hcl
 
 # 5. Deploy workloads to the cluster
 helm upgrade --install matlab helm-charts/matlab-parallel-server \
