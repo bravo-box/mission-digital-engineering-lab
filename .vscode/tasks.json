@@ -1,0 +1,111 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: Copy Terraform variables",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "set -euo pipefail; target=\"${workspaceFolder}/infra/terraform.tfvars\"; if [[ -e \"$target\" ]]; then echo \"Refusing to overwrite $target\" >&2; exit 1; fi; cp \"${workspaceFolder}/infra/terraform.tfvars.example\" \"$target\"; echo \"Created $target\""
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Azure: Create landing zone",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/creating-lz.sh",
+      "args": [
+        "--resource-group",
+        "${input:landingZoneResourceGroup}",
+        "--location",
+        "${input:azureLocation}",
+        "--name",
+        "${input:virtualNetworkName}",
+        "--address-space",
+        "${input:virtualNetworkAddressSpace}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Azure: Create Packer resource group",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/create-packer-rg.sh",
+      "args": [
+        "--resource-group",
+        "${input:packerResourceGroup}",
+        "--location",
+        "${input:azureLocation}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Terraform: Plan",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/deploy-terraform.sh",
+      "args": [
+        "plan"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Terraform: Deploy",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/deploy-terraform.sh",
+      "args": [
+        "deploy"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Terraform: Destroy",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/deploy-terraform.sh",
+      "args": [
+        "destroy"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Setup: Install Docker on Ubuntu",
+      "type": "shell",
+      "command": "sudo",
+      "args": [
+        "${workspaceFolder}/scripts/install-docker-ubuntu.sh"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "azureLocation",
+      "type": "promptString",
+      "description": "Azure region",
+      "default": "usgovvirginia"
+    },
+    {
+      "id": "landingZoneResourceGroup",
+      "type": "promptString",
+      "description": "Landing zone resource group",
+      "default": "rg-delab-network"
+    },
+    {
+      "id": "virtualNetworkName",
+      "type": "promptString",
+      "description": "Landing zone virtual network name",
+      "default": "vnet-delab"
+    },
+    {
+      "id": "virtualNetworkAddressSpace",
+      "type": "promptString",
+      "description": "Landing zone virtual network address space",
+      "default": "10.100.0.0/16"
+    },
+    {
+      "id": "packerResourceGroup",
+      "type": "promptString",
+      "description": "Packer resource group",
+      "default": "rg-delab-packer"
+    }
+  ]
+}

@@ -51,6 +51,12 @@ Azure CLI credentials and the Terraform provider cache are kept in named
 volumes, so they survive container rebuilds. The commands below can then be run
 directly from the container terminal.
 
+The same setup and deployment commands are available from **Tasks: Run Task**
+in VS Code. Tasks are provided for copying `terraform.tfvars`, creating the
+landing zone and Packer resource group, planning/deploying/destroying Terraform,
+and installing Docker on an Ubuntu host. Terraform deploy and destroy tasks
+retain their interactive approval prompts.
+
 ```bash
 # 1. Create the landing zone virtual network (skip if one already exists)
 ./scripts/creating-lz.sh --resource-group rg-delab-network --name vnet-delab
