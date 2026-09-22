@@ -7,6 +7,7 @@ Packer templates that build the MATLAB development VM images used in the
 | --- | --- |
 | `matlab-dev-linux-vm.pkr.hcl` | Ubuntu 24.04 LTS with MATLAB, Parallel Computing Toolbox, MATLAB Parallel Server, and Simulink |
 | `matlab-dev-win-vm.pkr.hcl` | Windows Server 2022 with MATLAB, Parallel Computing Toolbox, MATLAB Parallel Server and Simulink |
+| `matlab-license-server.pkr.hcl` | Ubuntu 24.04 LTS with the MathWorks Network License Manager |
 
 The Linux template is adapted from the MathWorks
 [`build-azure-matlab.pkr.hcl`](https://github.com/mathworks-ref-arch/matlab-on-azure/blob/master/packer/v1/build-azure-matlab.pkr.hcl)
@@ -33,6 +34,12 @@ To build the Windows development image, substitute
 The Windows template follows the MathWorks Azure reference architecture: it
 installs MATLAB with the MathWorks package manager, restarts Windows, waits for
 the Azure guest services, and runs Sysprep before image capture.
+
+To build the license-server image, substitute
+`matlab-license-server.pkr.hcl`. The template downloads the standalone
+MathWorks Network License Manager for `matlab_release`; override
+`license_manager_archive_url` for an internal mirror and optionally set
+`license_manager_archive_sha256` to verify the archive.
 
 Builds authenticate as the Azure CLI user (`use_azure_cli_auth = true`) and
 target Azure Government by default (`cloud_environment_name = "Usgovernment"`).
@@ -70,6 +77,25 @@ packer build -var "gallery_name=sigdelab" -var "gallery_image_version=1.0.0" mat
 
 Licensing is not baked into the image: set `MLM_LICENSE_FILE` on the deployed
 VM to point at the network license manager.
+
+## License server runtime setup
+
+The license-server image intentionally does not contain a license because a
+network license file is generated for the deployed server's host ID. After
+creating a VM from `matlab-license-server`, copy its Linux network license file
+to `/etc/mathworks/license.dat`, set ownership and permissions, and start the
+preconfigured service:
+
+```bash
+sudo chown root:matlab-license /etc/mathworks/license.dat
+sudo chmod 0640 /etc/mathworks/license.dat
+sudo systemctl start matlab-license-manager
+sudo systemctl status matlab-license-manager
+```
+
+Allow the license-manager and vendor-daemon ports from MATLAB clients in the
+VM's network security rules. Pin both ports in `license.dat` so those rules can
+remain narrow. Clients can then use `MLM_LICENSE_FILE=<port>@<license-server>`.
 
 Override `matlab_release`, `matlab_products`, `matlab_source_location`, or the
 base-image variables with `-var` arguments or a Packer variable file. Each
