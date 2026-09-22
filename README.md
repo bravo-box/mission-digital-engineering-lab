@@ -68,7 +68,10 @@ $EDITOR infra/terraform.tfvars
 packer init packer/matlab-dev-vm.pkr.hcl
 packer build packer/matlab-dev-vm.pkr.hcl
 
-# 5. Deploy workloads to the cluster
+# 5. Create a private MATLAB development VM from the image
+./scripts/create-matlab-vm.sh --name matlab-dev-01
+
+# 6. Deploy workloads to the cluster
 helm upgrade --install matlab helm-charts/matlab-parallel-server \
   --set image.repository=<registry-login-server>/matlab-parallel-server
 ```

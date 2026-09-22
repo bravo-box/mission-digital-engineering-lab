@@ -25,6 +25,12 @@ packer build \
 Builds authenticate as the Azure CLI user (`use_azure_cli_auth = true`) and
 target Azure Government by default (`cloud_environment_name = "Usgovernment"`).
 
+Create a private VM from the resulting managed image:
+
+```bash
+../scripts/create-matlab-vm.sh --name matlab-dev-01
+```
+
 ## Private builds
 
 Set `build_subnet_id` to a subnet resource ID to keep the temporary build VM on
@@ -47,6 +53,7 @@ To let Packer create a temporary build resource group instead, leave
 ```bash
 ../scripts/create-packer-rg.sh --gallery sigdelab
 packer build -var "gallery_name=sigdelab" -var "gallery_image_version=1.0.0" matlab-dev-vm.pkr.hcl
+../scripts/create-matlab-vm.sh --name matlab-dev-01 --gallery sigdelab --image-version 1.0.0
 ```
 
 Licensing is not baked into the image: set `MLM_LICENSE_FILE` on the deployed
