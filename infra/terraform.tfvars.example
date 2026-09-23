@@ -16,7 +16,11 @@ subnet_address_prefixes = {
   registry       = "10.100.4.64/26"
   foundry        = "10.100.4.128/26"
   key_vault      = "10.100.4.192/26"
+  api_management = "10.100.6.0/24"
 }
+
+# Replace this placeholder with the address for the API publisher.
+api_management_publisher_email = "admin@example.com"
 
 # Set to true to deploy Azure Bastion for private access to the MATLAB VMs.
 deploy_bastion                = false

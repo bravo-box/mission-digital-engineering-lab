@@ -7,8 +7,8 @@ network.
 
 ## Resources
 
-- Six subnets in the existing virtual network (`matlab-vms`, `matlab-cluster`,
-  `storage`, `registry`, `foundry`, `key-vault`), each with a network security
+- Seven subnets in the existing virtual network (`matlab-vms`, `matlab-cluster`,
+  `storage`, `registry`, `foundry`, `key-vault`, `api-management`), each with a network security
   group that denies inbound traffic from the internet.
 - Optional `AzureBastionSubnet`, public IP and Azure Bastion host
   (`deploy_bastion = true`).
@@ -26,7 +26,13 @@ network.
 - Azure AI Foundry (AI Services) account with local authentication disabled and
   a private endpoint registered in the `cognitiveservices`, `openai` and
   `services.ai` private DNS zones.
-- Private DNS zones for each service, linked to the existing virtual network.
+- API Management AI gateway in internal VNet mode with public network access
+  disabled, a subscription-key-protected API, a published `Foundry Models`
+  developer portal product, and private access to the Foundry endpoint. APIM
+  uses its system-assigned managed identity and the `Cognitive Services User`
+  role for model inference; no Foundry keys are stored or forwarded.
+- Private DNS zones for each service, including the APIM gateway, developer
+  portal, and management endpoints, linked to the existing virtual network.
   Zone names are selected automatically for the target cloud.
 
 ## Usage
@@ -62,6 +68,8 @@ the CLI user's Entra ID credentials because account keys are disabled.
 | `location` | `usgovvirginia` | Region for the lab resources |
 | `name_prefix` | `delab` | Prefix used for every resource name |
 | `subnet_address_prefixes` | see `variables.tf` | Address prefix of each lab subnet |
+| `api_management_sku` | `Developer_1` | VNet-capable APIM SKU (`Premium_1` or higher is recommended for production) |
+| `api_management_publisher_email` | `admin@example.com` | Publisher contact shown by API Management |
 | `deploy_bastion` | `false` | Deploy Azure Bastion and `AzureBastionSubnet` |
 | `bastion_subnet_address_prefix` | `10.100.5.0/26` | Prefix for `AzureBastionSubnet` (/26 or larger) |
 | `aks_outbound_type` | `loadBalancer` | Set to `userDefinedRouting` when egress is forced through a firewall |
@@ -76,7 +84,7 @@ changes.
 Each infrastructure component is isolated under `modules/` with its resources,
 inputs, and outputs split across `main.tf`, `variables.tf`, and `outputs.tf`.
 The root module creates shared resources and composes the `network`, `storage`,
-`registry`, `key_vault`, `foundry`, and `aks` modules. The reusable
+`registry`, `key_vault`, `foundry`, `api_management`, and `aks` modules. The reusable
 `private_endpoint` module is consumed by service modules.
 
 ## Notes
@@ -87,3 +95,10 @@ The root module creates shared resources and composes the `network`, `storage`,
 - The storage account has key based access disabled, so data plane operations
   require Entra ID credentials and an appropriate data plane role such as
   `Storage Blob Data Contributor`.
+- Invoke chat completions through
+  `<api_management_foundry_api_url>/deployments/<deployment-name>/chat/completions?api-version=<version>`
+  with an `Ocp-Apim-Subscription-Key` header. APIM replaces client credentials
+  with a managed identity token when it calls Foundry.
+- Use the `api_management_developer_portal_url` output to discover the API and
+  subscribe to the published `Foundry Models` product from inside the virtual
+  network.

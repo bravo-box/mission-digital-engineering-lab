@@ -6,6 +6,7 @@ locals {
     registry       = "registry"
     foundry        = "foundry"
     key_vault      = "key-vault"
+    api_management = "api-management"
   }
 
   private_endpoint_subnets = ["matlab_cluster", "storage", "registry", "foundry", "key_vault"]
@@ -65,6 +66,34 @@ resource "azurerm_subnet_network_security_group_association" "lab" {
 
   subnet_id                 = each.value.id
   network_security_group_id = azurerm_network_security_group.lab[each.key].id
+}
+
+resource "azurerm_network_security_rule" "api_management_control_plane" {
+  name                        = "AllowApiManagementControlPlaneInBound"
+  priority                    = 210
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "3443"
+  source_address_prefix       = "ApiManagement"
+  destination_address_prefix  = "VirtualNetwork"
+  resource_group_name         = var.resource_group_name
+  network_security_group_name = azurerm_network_security_group.lab["api_management"].name
+}
+
+resource "azurerm_network_security_rule" "api_management_load_balancer" {
+  name                        = "AllowAzureLoadBalancerInBound"
+  priority                    = 220
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "6390"
+  source_address_prefix       = "AzureLoadBalancer"
+  destination_address_prefix  = "VirtualNetwork"
+  resource_group_name         = var.resource_group_name
+  network_security_group_name = azurerm_network_security_group.lab["api_management"].name
 }
 
 resource "azurerm_subnet" "bastion" {

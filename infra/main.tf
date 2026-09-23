@@ -20,31 +20,34 @@ locals {
   # Private DNS zone names differ per cloud.
   private_dns_zone_names = {
     public = {
-      blob      = "privatelink.blob.core.windows.net"
-      dfs       = "privatelink.dfs.core.windows.net"
-      vault     = "privatelink.vaultcore.azure.net"
-      registry  = "privatelink.azurecr.io"
-      cognitive = "privatelink.cognitiveservices.azure.com"
-      openai    = "privatelink.openai.azure.com"
-      ai        = "privatelink.services.ai.azure.com"
+      blob           = "privatelink.blob.core.windows.net"
+      dfs            = "privatelink.dfs.core.windows.net"
+      vault          = "privatelink.vaultcore.azure.net"
+      registry       = "privatelink.azurecr.io"
+      cognitive      = "privatelink.cognitiveservices.azure.com"
+      openai         = "privatelink.openai.azure.com"
+      ai             = "privatelink.services.ai.azure.com"
+      api_management = "azure-api.net"
     }
     usgovernment = {
-      blob      = "privatelink.blob.core.usgovcloudapi.net"
-      dfs       = "privatelink.dfs.core.usgovcloudapi.net"
-      vault     = "privatelink.vaultcore.usgovcloudapi.net"
-      registry  = "privatelink.azurecr.us"
-      cognitive = "privatelink.cognitiveservices.azure.us"
-      openai    = "privatelink.openai.azure.us"
-      ai        = "privatelink.services.ai.azure.us"
+      blob           = "privatelink.blob.core.usgovcloudapi.net"
+      dfs            = "privatelink.dfs.core.usgovcloudapi.net"
+      vault          = "privatelink.vaultcore.usgovcloudapi.net"
+      registry       = "privatelink.azurecr.us"
+      cognitive      = "privatelink.cognitiveservices.azure.us"
+      openai         = "privatelink.openai.azure.us"
+      ai             = "privatelink.services.ai.azure.us"
+      api_management = "azure-api.us"
     }
     china = {
-      blob      = "privatelink.blob.core.chinacloudapi.cn"
-      dfs       = "privatelink.dfs.core.chinacloudapi.cn"
-      vault     = "privatelink.vaultcore.azure.cn"
-      registry  = "privatelink.azurecr.cn"
-      cognitive = "privatelink.cognitiveservices.azure.cn"
-      openai    = "privatelink.openai.azure.cn"
-      ai        = "privatelink.services.ai.azure.cn"
+      blob           = "privatelink.blob.core.chinacloudapi.cn"
+      dfs            = "privatelink.dfs.core.chinacloudapi.cn"
+      vault          = "privatelink.vaultcore.azure.cn"
+      registry       = "privatelink.azurecr.cn"
+      cognitive      = "privatelink.cognitiveservices.azure.cn"
+      openai         = "privatelink.openai.azure.cn"
+      ai             = "privatelink.services.ai.azure.cn"
+      api_management = "azure-api.cn"
     }
   }
 
@@ -152,6 +155,34 @@ module "foundry" {
     azurerm_private_dns_zone.lab["ai"].id,
   ]
   tags = local.tags
+}
+
+module "api_management" {
+  source = "./modules/api_management"
+
+  name_prefix           = var.name_prefix
+  suffix                = local.suffix
+  location              = azurerm_resource_group.lab.location
+  resource_group_name   = azurerm_resource_group.lab.name
+  subnet_id             = module.network.subnet_ids_by_purpose["api_management"]
+  sku_name              = var.api_management_sku
+  publisher_name        = var.api_management_publisher_name
+  publisher_email       = var.api_management_publisher_email
+  foundry_account_id    = module.foundry.id
+  foundry_endpoint      = module.foundry.endpoint
+  private_dns_zone_name = azurerm_private_dns_zone.lab["api_management"].name
+  managed_identity_audience = {
+    public       = "https://cognitiveservices.azure.com"
+    usgovernment = "https://cognitiveservices.azure.us"
+    china        = "https://cognitiveservices.azure.cn"
+  }[var.azure_environment]
+  tags = local.tags
+
+  depends_on = [
+    module.network,
+    module.foundry,
+    azurerm_private_dns_zone_virtual_network_link.lab["api_management"],
+  ]
 }
 
 module "aks" {
