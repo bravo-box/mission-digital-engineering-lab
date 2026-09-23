@@ -32,6 +32,7 @@ variable "subnet_address_prefixes" {
     registry       = string
     foundry        = string
     key_vault      = string
+    api_management = optional(string, "10.100.6.0/24")
   })
 }
 

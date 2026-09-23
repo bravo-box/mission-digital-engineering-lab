@@ -53,6 +53,26 @@ output "foundry_endpoint" {
   value       = module.foundry.endpoint
 }
 
+output "api_management_name" {
+  description = "Name of the API Management AI gateway."
+  value       = module.api_management.name
+}
+
+output "api_management_gateway_url" {
+  description = "Private API Management gateway URL used to invoke Foundry models from the virtual network."
+  value       = module.api_management.gateway_url
+}
+
+output "api_management_developer_portal_url" {
+  description = "Developer portal URL used to subscribe to the Foundry Models product."
+  value       = module.api_management.developer_portal_url
+}
+
+output "api_management_foundry_api_url" {
+  description = "Base URL for the Foundry API exposed through API Management."
+  value       = "${module.api_management.gateway_url}/openai"
+}
+
 output "bastion_host_name" {
   description = "Name of the Azure Bastion host, when deployed."
   value       = module.network.bastion_host_name

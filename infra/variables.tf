@@ -67,6 +67,7 @@ variable "subnet_address_prefixes" {
     registry       = string
     foundry        = string
     key_vault      = string
+    api_management = optional(string, "10.100.6.0/24")
   })
 
   default = {
@@ -76,6 +77,7 @@ variable "subnet_address_prefixes" {
     registry       = "10.100.4.64/26"
     foundry        = "10.100.4.128/26"
     key_vault      = "10.100.4.192/26"
+    api_management = "10.100.6.0/24"
   }
 }
 
@@ -120,6 +122,29 @@ variable "foundry_sku" {
   description = "SKU for the Azure AI Foundry (AI Services) account."
   type        = string
   default     = "S0"
+}
+
+variable "api_management_sku" {
+  description = "API Management SKU. Developer is intended for lab use; use Premium for production."
+  type        = string
+  default     = "Developer_1"
+
+  validation {
+    condition     = can(regex("^(Developer|Premium)_[1-9][0-9]*$", var.api_management_sku))
+    error_message = "api_management_sku must use a VNet-capable Developer or Premium SKU, such as Developer_1 or Premium_1."
+  }
+}
+
+variable "api_management_publisher_name" {
+  description = "Publisher name displayed by API Management."
+  type        = string
+  default     = "Digital Engineering Lab"
+}
+
+variable "api_management_publisher_email" {
+  description = "Publisher email used by API Management."
+  type        = string
+  default     = "admin@example.com"
 }
 
 variable "key_vault_admin_object_ids" {
